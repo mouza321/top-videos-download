@@ -22,8 +22,14 @@ document.getElementById('download-form').addEventListener('submit', async functi
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
-            messageDiv.textContent = 'Error: ' + (errorData.error || 'Unknown error');
+            let errorText = 'Unknown error';
+            try {
+                const errorData = await response.json();
+                errorText = errorData.error || errorText;
+            } catch {
+                errorText = await response.text();
+            }
+            messageDiv.textContent = 'Error: ' + errorText;
             messageDiv.style.color = 'red';
             return;
         }
