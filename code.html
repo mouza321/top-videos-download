@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متحمّل الفيديو - حمّل من أي موقع</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #f8fafc;
+        }
+        .video-preview {
+            aspect-ratio: 16/9;
+            background-color: #000;
+        }
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <header class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/c169ace3-ddf4-4eb9-b9ac-df2d2581806c.png" alt="شعار متحمّل الفيديو - أيقونة تشغيل فيديو زرقاء على خلفية بيضاء" class="mr-3">
+                    <h1 class="text-2xl font-bold text-blue-600">متحمّل الفيديو</h1>
+                </div>
+                <nav>
+                    <ul class="flex space-x-6 space-x-reverse">
+                        <li><a href="#" class="text-gray-700 hover:text-blue-600">الرئيسية</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-blue-600">كيفية الاستخدام</a></li>
+                        <li><a href="#" class="text-gray-700 hover:text-blue-600">الأسئلة الشائعة</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-12">
+        <section class="max-w-3xl mx-auto text-center mb-16">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">حمّل الفيديوهات من أي موقع بسرعة وسهولة</h2>
+            <p class="text-lg text-gray-600 mb-8">فقط انسخ رابط الفيديو من يوتيوب، فيسبوك، تويتر وغيرها ثم الصقه بالأسفل</p>
+            
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <div class="flex mb-4">
+                    <input type="text" id="videoUrl" placeholder="https://www.youtube.com/watch?v=..." class="flex-grow px-4 py-3 border border-gray-300 rounded-r-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    <button onclick="fetchVideoInfo()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-l-md transition duration-300">
+                        تحليل الرابط
+                    </button>
+                </div>
+                <div id="error-message" class="text-red-500 text-sm text-right hidden"></div>
+            </div>
+
+            <div id="loader" class="flex justify-center my-8 hidden">
+                <div class="loader"></div>
+                <span class="mr-2">جاري تحميل معلومات الفيديو...</span>
+            </div>
+
+            <div id="video-info" class="hidden">
+                <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+                    <div class="video-preview flex items-center justify-center">
+                        <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/65ff6008-c5cb-4e70-9199-1ce26a4d8e28.png" alt="معاينة الفيديو - صورة توضيحية لفيديو في وضع الانتظار مع أيقونة تشغيل في المنتصف" id="video-thumbnail" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <h3 id="video-title" class="text-xl font-bold text-gray-800 mb-2">عنوان الفيديو</h3>
+                        <p id="video-duration" class="text-gray-600 mb-4">المدة: --:--</p>
+                        
+                        <div class="mb-4">
+                            <label for="quality-select" class="block text-sm font-medium text-gray-700 mb-2">اختر جودة التحميل:</label>
+                            <select id="quality-select" class="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <option value="" selected disabled>-- اختر الجودة --</option>
+                            </select>
+                        </div>
+                        
+                        <button onclick="downloadVideo()" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-md transition duration-300">
+                            تحميل الفيديو
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mt-16">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-8">المواقع المدعومة</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                <div class="bg-white p-4 rounded-lg shadow-sm text-center">
+                    <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/cdab616a-8bbb-4558-a95f-0dade1ba6566.png" alt="شعار يوتيوب - أيقونة يوتيوب الحمراء" class="mx-auto mb-3">
+                    <p class="font-medium text-gray-700">يوتيوب</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm text-center">
+                    <img src="https://placehold.co/80x80" alt="شعار فيسبوك - أيقونة فيسبوك الزرقاء" class="mx-auto mb-3">
+                    <p class="font-medium text-gray-700">فيسبوك</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm text-center">
+                    <img src="https://placehold.co/80x80" alt="شعار تويتر - أيقونة تويتر الزرقاء" class="mx-auto mb-3">
+                    <p class="font-medium text-gray-700">تويتر</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm text-center">
+                    <img src="https://placehold.co/80x80" alt="شعار إنستغرام - أيقونة إنستغرام متعددة الألوان" class="mx-auto mb-3">
+                    <p class="font-medium text-gray-700">إنستغرام</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm text-center">
+                    <img src="https://placehold.co/80x80" alt="شعار تيك توك - أيقونة تيك توك السوداء" class="mx-auto mb-3">
+                    <p class="font-medium text-gray-700">تيك توك</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm text-center">
+                    <img src="https://placehold.co/80x80" alt="شعار فايميو - أيقونة فايميو الزرقاء" class="mx-auto mb-3">
+                    <p class="font-medium text-gray-700">فايميو</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between">
+                <div class="mb-8 md:mb-0">
+                    <h3 class="text-xl font-bold mb-4">متحمّل الفيديو</h3>
+                    <p class="text-gray-400">أداة مجانية لتحميل الفيديوهات من مختلف المنصات</p>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-8">
+                    <div>
+                        <h4 class="font-bold mb-4">روابط سريعة</h4>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-gray-400 hover:text-white">الرئيسية</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">حول الخدمة</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">الشروط والأحكام</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-bold mb-4">الدعم</h4>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-gray-400 hover:text-white">اتصل بنا</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white">الأسئلة الشائعة</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-bold mb-4">تابعنا</h4>
+                        <div class="flex space-x-4 space-x-reverse">
+                            <a href="#" class="text-gray-400 hover:text-white">
+                                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/0d21a534-72e6-4acf-b35e-d76304220279.png" alt="أيقونة فيسبوك للتواصل الاجتماعي">
+                            </a>
+                            <a href="#" class="text-gray-400 hover:text-white">
+                                <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/e2c02d82-e84c-4fba-a5ce-288d4bd6f94d.png" alt="أيقونة تويتر للتواصل الاجتماعي">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>© 2023 متحمّل الفيديو. جميع الحقوق محفوظة.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
